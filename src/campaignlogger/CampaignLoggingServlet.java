@@ -12,10 +12,13 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CampaignLoggingServlet extends HttpServlet {
 
     private MessageDigest messageDigest;
+    private Map<String, String> xmlEntities = new HashMap<String, String>();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -28,7 +31,7 @@ public class CampaignLoggingServlet extends HttpServlet {
         adBlock.setProperty("date", new Date());
         adBlock.setProperty("url", url);
         adBlock.setProperty("slot", slot);
-        adBlock.setProperty("content", new Text(content));
+        adBlock.setProperty("content", new Text(unescapeXml(content)));
 
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(adBlock);
@@ -53,5 +56,20 @@ public class CampaignLoggingServlet extends HttpServlet {
             buf.append(Integer.toHexString((b & 0xFF) | 0x100).substring(1, 3));
         }
         return buf.toString();
+    }
+
+    private String unescapeXml(String s) {
+        if (xmlEntities.isEmpty()) {
+            xmlEntities.put("quot", "\"");
+            xmlEntities.put("amp", "&");
+            xmlEntities.put("apos", "'");
+            xmlEntities.put("lt", "<");
+            xmlEntities.put("gt", ">");
+        }
+        String result = s;
+        for (Map.Entry<String, String> entry : xmlEntities.entrySet()) {
+            result = result.replace("&" + entry.getKey() + ";", entry.getValue());
+        }
+        return result;
     }
 }
