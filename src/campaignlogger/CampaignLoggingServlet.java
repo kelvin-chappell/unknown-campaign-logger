@@ -21,6 +21,7 @@ public class CampaignLoggingServlet extends HttpServlet {
         String url = request.getParameter("url");
         String slot = request.getParameter("slot");
         String content = request.getParameter("content");
+
         Entity adBlock = new Entity("AdBlock");
         adBlock.setProperty("hash", hash(content));
         adBlock.setProperty("date", new Date());
@@ -30,6 +31,8 @@ public class CampaignLoggingServlet extends HttpServlet {
 
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(adBlock);
+
+        response.setContentType("application/javascript");
     }
 
     private MessageDigest getMessageDigest() {
