@@ -3,6 +3,7 @@ package campaignlogger;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Text;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,7 @@ public class CampaignLoggingServlet extends HttpServlet {
         adBlock.setProperty("date", new Date());
         adBlock.setProperty("url", url);
         adBlock.setProperty("slot", slot);
-        adBlock.setProperty("content", content);
+        adBlock.setProperty("content", new Text(content));
 
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(adBlock);
